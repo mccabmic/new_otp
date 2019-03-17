@@ -140,11 +140,10 @@ int main(int argc, char* argv[]){
 			}
 			
 			key[str_size] = '\0';
-			
 			my_encrypt(message, key);
 			printf("%s\n", message);
-			my_decrypt(message, key);
-			printf("%s\n", message);
+			sendall(task_sock, message, &str_size);
+			
 			close(task_sock);
 			free(key);
 			free(message);

@@ -61,7 +61,6 @@ int main(int argc, char *argv[]){
 		}
 		
 		inet_ntop(traverse->ai_family, traverse->ai_addr, s, sizeof(s));
-		printf("%s: attempting connection to: %s\n", __FILE__, s);
 		if (connect(connect_socket, traverse->ai_addr, traverse->ai_addrlen) == -1){
 			close(connect_socket);
 			fprintf(stderr, "%s: connect error\n", __FILE__);
@@ -104,11 +103,21 @@ int main(int argc, char *argv[]){
 	
 	sendall(connect_socket, plaintext, &size);
 	sendall(connect_socket, key, &size);
+
+	free(key);
+	free(plaintext);
+	
+	char* response = malloc(sizeof(char) * size);
+	memset(response, '\0', size);
+	char buffer[MAXDATASIZE] = {0};
+	int nbytes = 0;
+	while((nbytes = recv(connect_socket, buffer, size, 0)) > 0){
+		strcat(response, buffer);
+		memset(buffer, '\0', sizeof(char) * MAXDATASIZE - 1);
+	}
 	
 	close(connect_socket);
-	
-	free(plaintext);
-	free(key);
-
+	response[size] = '\0';		
+	printf("%s\n", response);
 	return 0;
 }
